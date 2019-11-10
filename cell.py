@@ -12,16 +12,16 @@ class Cell():
         self.state = 'healthy'
         self.fasta = fasta
         # Need to do 2 times to account for 2 copies of each chromosome
-        self.genes = dataframe(annotation)
+        self.frame = dataframe(annotation)
         self.genes = [
             Gene(
-                self.genes['gene_id'][i],
-                self.genes['chromosome'][i],
-                self.genes['start'][i],
-                self.genes['end'][i],
-                self.genes['strand'][i]
+                self.frame['gene_id'][i],
+                self.frame['chromosome'][i],
+                self.frame['start'][i],
+                self.frame['end'][i],
+                self.frame['strand'][i]
             )
-            for i, feature in enumerate(self.genes['feature'])
+            for i, feature in enumerate(self.frame['feature'])
             if feature=='gene'
         ]
         self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
@@ -38,6 +38,12 @@ class Cell():
                         gene.sequence = str(
                             chromo.seq[gene.start : gene.end + 1]
                         )
+
+    def update_chromosome(self, chromosome, length, index):
+        while (index < len(self.genes)) and (self.genes[index].chromosome == chromosome):
+            self.genes[index].start += length
+            self.genes[index].end += length
+            index += 1
 
     def get_state():
         pass

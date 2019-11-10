@@ -10,3 +10,11 @@ class Gene():
 
     def __len__(self):
         return self.end - self.start
+
+    def insert_sequence(self, pos, sequence):
+        self.sequence = self.sequence[:pos] + sequence + self.sequence[pos:]
+        self.end += len(sequence)
+
+    def delete_sequence(self, start, end):
+        self.sequence = self.sequence[:start] + self.sequence[end:]
+        self.end -= end - start

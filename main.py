@@ -12,15 +12,16 @@ def main(fasta, gtf):
     #     print(my_cell.genes[i].chromosome, my_cell.genes[i].start)
     a = [my_cell.genes[i].start for i in range(850, 870)]
     # print(a)
-    utils.duplicate(my_cell)
-    b = [my_cell.genes[i].start for i in range(850, 870)]
-    for i in range(len(a)):
-        print(a[i], b[i])
-
+    for i in range(10):
+        c = utils.random_operation(my_cell)
+        # b = [my_cell.genes[i].start for i in range(850, 870)]
+        # for i in range(len(a)):
+        #     print(a[i], b[i])
+        print(c)
 
 if __name__ in "__main__":
     fasta = "data/chromosome/Homo_sapiens.GRCh38.dna.chromosome.21.fa"
     gtf = "data/chr21_genes.gtf"
     big_fasta = "data/chromosome/all_chromosome.fa"
     big_gtf = "data/genes.gtf"
-    main(fasta, gtf)
+    main(big_fasta, big_gtf)
