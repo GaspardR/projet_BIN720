@@ -11,6 +11,10 @@ def get_random_interval(x):
 def random_delete(cell):
     i = random.choice(range(len(cell.genes)))
     gene = cell.genes[i]
+    if len(gene) <= 15:
+        return random_delete(cell)
+    if cell.is_important(gene):
+        cell.state += 1
     start, end = get_random_interval(len(gene))
     gene.delete_sequence(start, end)
     cell.update_chromosome(gene.chromosome, -(end-start), i+1)
@@ -22,6 +26,8 @@ def random_delete(cell):
 def random_duplicate(cell):
     i = random.choice(range(len(cell.genes)))
     gene = cell.genes[i]
+    if cell.is_important(gene):
+        cell.state += 1
     start, end = get_random_interval(len(gene))
     sequence = gene.sequence[start:end]
     gene.insert_sequence(end, sequence)
@@ -35,12 +41,16 @@ def random_insert(cell):
     # Get a sequence
     i = random.choice(range(len(cell.genes)))
     gene1 = cell.genes[i]
+    if cell.is_important(gene1):
+        cell.state += 1
     start, end = get_random_interval(len(gene1))
     sequence = gene1.sequence[start:end]
 
     # Insert sequence in another gene
     j = random.choice(range(len(cell.genes)))
     gene2 = cell.genes[j]
+    if cell.is_important(gene2):
+        cell.state += 1
     pos = random.choice(range(len(gene2)))
     gene2.insert_sequence(pos, sequence)
     cell.update_chromosome(gene2.chromosome, len(sequence), j+1)
@@ -55,6 +65,8 @@ def random_move(cell):
     # Get a sequence and remove it
     i = random.choice(range(len(cell.genes)))
     gene1 = cell.genes[i]
+    if cell.is_important(gene1):
+        cell.state += 1
     start, end = get_random_interval(len(gene1))
     sequence = gene1.sequence[start:end]
     gene1.delete_sequence(start, end)
@@ -63,6 +75,8 @@ def random_move(cell):
     # Insert sequence in another gene
     j = random.choice(range(len(cell.genes)))
     gene2 = cell.genes[j]
+    if cell.is_important(gene2):
+        cell.state += 1
     pos = random.choice(range(len(gene2)))
     gene2.insert_sequence(pos, sequence)
     cell.update_chromosome(gene2.chromosome, len(sequence), j+1)
@@ -76,6 +90,8 @@ def random_move(cell):
 def random_gene_duplication(cell):
     i = random.choice(range(len(cell.genes)))
     gene = cell.genes[i]
+    if cell.is_important(gene):
+        cell.state += 1
     gene_copy = gene.copy()
     gene_copy.start = gene.end + 1
     gene_copy.end = gene_copy.start + len(gene)
@@ -99,6 +115,8 @@ def random_gene_insert(cell):
     # Get random gene_copy
     i = random.choice(range(len(cell.genes)))
     gene = cell.genes[i]
+    if cell.is_important(gene):
+        cell.state += 1
     gene_copy = gene.copy()
 
     # Get other random gene and insert gene_copy after it
@@ -127,6 +145,8 @@ def random_gene_move(cell):
     # Get random gene and remove from cell
     i = random.choice(range(len(cell.genes)))
     gene = cell.remove_gene(i)
+    if cell.is_important(gene):
+        cell.state += 1
     to_return = [
         gene.chromosome,
         gene.gene_id,
@@ -154,6 +174,14 @@ def random_gene_move(cell):
 
 
 def random_operation(cell):
-    operations = [random_delete, random_duplicate, random_insert, random_move]
+    operations = [
+        random_delete,
+        random_duplicate,
+        random_insert,
+        random_move,
+        random_gene_duplication,
+        random_gene_insert,
+        random_gene_move
+    ]
     op = random.choice(operations)
     return op(cell)
