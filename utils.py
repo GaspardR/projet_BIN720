@@ -95,6 +95,64 @@ def random_gene_duplication(cell):
     return to_return
 
 
+def random_gene_insert(cell):
+    # Get random gene_copy
+    i = random.choice(range(len(cell.genes)))
+    gene = cell.genes[i]
+    gene_copy = gene.copy()
+
+    # Get other random gene and insert gene_copy after it
+    j = random.choice(range(len(cell.genes)))
+    gene2 = cell.genes[j]
+    gene_copy.chromosome = gene2.chromosome
+    gene_copy.start = gene2.end + 1
+    gene_copy.end = gene_copy.start + len(gene)
+    cell.add_gene(gene_copy, index=j+1)
+    cell.update_chromosome(gene_copy.chromosome, len(gene_copy), j+2)
+    to_return = [
+        gene.chromosome,
+        gene.gene_id,
+        gene.start,
+        gene.end,
+        gene_copy.chromosome,
+        gene_copy.gene_id,
+        gene_copy.start,
+        gene_copy.end,
+        'g_IN'
+    ]
+    return to_return
+
+
+def random_gene_move(cell):
+    # Get random gene and remove from cell
+    i = random.choice(range(len(cell.genes)))
+    gene = cell.remove_gene(i)
+    to_return = [
+        gene.chromosome,
+        gene.gene_id,
+        gene.start,
+        gene.end,
+    ]
+    l = len(gene)
+
+    # Get other random gene and insert gene after it
+    j = random.choice(range(len(cell.genes)))
+    gene2 = cell.genes[j]
+    gene.chromosome = gene2.chromosome
+    gene.start = gene2.end + 1
+    gene.end = gene.start + l
+    cell.add_gene(gene, index=j+1)
+    cell.update_chromosome(gene.chromosome, len(gene), j+2)
+    to_return += [
+        gene.chromosome,
+        gene.gene_id,
+        gene.start,
+        gene.end,
+        'g_MV'
+    ]
+    return to_return
+
+
 def random_operation(cell):
     operations = [random_delete, random_duplicate, random_insert, random_move]
     op = random.choice(operations)
