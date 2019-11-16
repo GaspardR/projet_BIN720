@@ -2,6 +2,7 @@
 
 # Public modules
 from Bio import SeqIO
+import random
 
 # User defined modules
 from gene import Gene
@@ -9,7 +10,7 @@ from gtf import dataframe
 
 class Cell():
     def __init__(self, fasta, annotation):
-        self.state = 'healthy'
+        self.state = 0
         self.fasta = fasta
         # Need to do 2 times to account for 2 copies of each chromosome
         self.frame = dataframe(annotation)
@@ -36,6 +37,7 @@ class Cell():
             if feature=='gene'
         ]
         self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
+        self.cancer_genes = self._random_gene_cancer_set()
 
     def add_gene(self, gene, index=None):
         if not isinstance(gene, Gene):
@@ -74,3 +76,16 @@ class Cell():
 
     def set_state():
         pass
+
+    def is_important(self, gene):
+        if not isinstance(gene, Gene):
+            raise TypeError('gene argument passed was not a Gene()')
+        for c_gene in self.cancer_genes:
+            if gene == c_gene:
+                return True
+        return False
+
+    def _random_gene_cancer_set(self):
+        # random.seed(5)
+        cancer_genes = random.sample(range(len(self.genes)), k=50)
+        return [self.genes[i] for i in cancer_genes]
