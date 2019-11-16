@@ -26,6 +26,16 @@ class Cell():
         ]
         self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
 
+    def add_gene(self, gene, index=None):
+        if not isinstance(gene, Gene):
+            raise TypeError('gene argument passed was not a Gene()')
+        if index:
+            self.genes.insert(index, gene)
+        else:
+            # For now, but this isn't pretty at all, should find better method
+            self.genes.append(gene)
+            self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
+
     def get_genes_sequence(self):
         for chromo in SeqIO.parse(self.fasta, 'fasta'):
             for gene in self.genes:
