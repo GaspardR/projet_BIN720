@@ -16,7 +16,18 @@ class Cell():
         self.genes = [
             Gene(
                 self.frame['gene_id'][i],
-                self.frame['chromosome'][i],
+                self.frame['chromosome'][i] + '_1',
+                self.frame['start'][i],
+                self.frame['end'][i],
+                self.frame['strand'][i]
+            )
+            for i, feature in enumerate(self.frame['feature'])
+            if feature=='gene'
+        ]
+        self.genes += [
+            Gene(
+                self.frame['gene_id'][i],
+                self.frame['chromosome'][i] + '_2',
                 self.frame['start'][i],
                 self.frame['end'][i],
                 self.frame['strand'][i]
@@ -35,6 +46,9 @@ class Cell():
             # For now, but this isn't pretty at all, should find better method
             self.genes.append(gene)
             self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
+
+    def remove_gene(self, index):
+        return self.genes.pop(index)
 
     def get_genes_sequence(self):
         for chromo in SeqIO.parse(self.fasta, 'fasta'):
