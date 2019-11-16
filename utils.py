@@ -16,7 +16,7 @@ def random_delete(cell):
     cell.update_chromosome(gene.chromosome, -(end-start), i+1)
     id = gene.gene_id
     chromo = gene.chromosome
-    return [chromo, id, start, end, '0', '0', 0, 0, 'DL']
+    return [chromo, id, start, end, '0', '0', 0, 0, 'f_DL']
 
 
 def random_duplicate(cell):
@@ -28,7 +28,7 @@ def random_duplicate(cell):
     cell.update_chromosome(gene.chromosome, len(sequence), i+1)
     id = gene.gene_id
     chromo = gene.chromosome
-    return [chromo, id, start, end, chromo, id, end, 0, 'DP']
+    return [chromo, id, start, end, chromo, id, end, 0, 'f_DP']
 
 
 def random_insert(cell):
@@ -48,7 +48,7 @@ def random_insert(cell):
     chromo1 = gene1.chromosome
     id2 = gene2.gene_id
     chromo2 = gene2.chromosome
-    return [chromo1, id1, start, end, chromo2, id2, pos, 0, 'IN']
+    return [chromo1, id1, start, end, chromo2, id2, pos, 0, 'f_IN']
 
 
 def random_move(cell):
@@ -70,7 +70,29 @@ def random_move(cell):
     chromo1 = gene1.chromosome
     id2 = gene2.gene_id
     chromo2 = gene2.chromosome
-    return [chromo1, id1, start, end, chromo2, id2, pos, 0, 'IN']
+    return [chromo1, id1, start, end, chromo2, id2, pos, 0, 'f_MV']
+
+
+def random_gene_duplication(cell):
+    i = random.choice(range(len(cell.genes)))
+    gene = cell.genes[i]
+    gene_copy = gene.copy()
+    gene_copy.start = gene.end + 1
+    gene_copy.end = gene_copy.start + len(gene)
+    cell.add_gene(gene_copy, index=i+1)
+    cell.update_chromosome(gene_copy.chromosome, len(gene_copy), i+2)
+    to_return = [
+        gene.chromosome,
+        gene.gene_id,
+        gene.start,
+        gene.end,
+        gene_copy.chromosome,
+        gene_copy.gene_id,
+        gene_copy.start,
+        gene_copy.end,
+        'g_DP'
+    ]
+    return to_return
 
 
 def random_operation(cell):
