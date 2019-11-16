@@ -12,6 +12,15 @@ class Gene():
     def __len__(self):
         return self.end - self.start
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (self.gene_id == other.gene_id and
+                self.sequence == other.sequence)
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def copy(self):
         other = Gene(
             self.gene_id,
