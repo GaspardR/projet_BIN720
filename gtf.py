@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 
+"""
+gtf.py
+Kamil Slowikowski (https://github.com/slowkow)
+December 24, 2013
+Read GFF/GTF files. Works with gzip compressed files and pandas.
+    http://useast.ensembl.org/info/website/upload/gff.html
+
+Slightly modified by jim (https://github.com/jimni) to add a progress bar
+
+Slightly modified to remove the progress bar and return a dict instead
+of pandas DataFrame.
+"""
+
 from collections import defaultdict
 import gzip
-import pandas as pd
 import re
 import sys
 
