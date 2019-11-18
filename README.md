@@ -21,6 +21,7 @@ git clone https://github.com/GaspardR/projet_BIN720.git
 ```
 
 Next, you need to download the human genome annotation and each chromosome sequence from Ensembl
+Also, you will need to download the cancer associated genes annotation from CancerMine
 ```bash
 cd /path/to/this/repository/
 mkdir data/
@@ -36,6 +37,9 @@ rm Homo_sapiens.GRCh38.dna.chromosome*
 wget ftp://ftp.ensembl.org/pub/release-98/gtf/homo_sapiens/Homo_sapiens.GRCh38.98.gtf.gz
 gunzip Homo_sapiens.GRCh38.98.gtf.gz
 awk '$3 == "gene" {print $0}' Homo_sapiens.GRCh38.98.gtf > annotation.gtf
+
+# Cancer associated genes annotation
+wget https://zenodo.org/record/3525385/files/cancermine_collated.tsv
 ```
 
 ### **Running**
@@ -46,4 +50,4 @@ python3 main.py
 
 ## **Authors**
 - **Gaspard Reulet**, <gaspard.reulet@usherbrooke.ca>
-- **Cyril Mougin** <cyril.mougin@usherbrooke.ca>
+- **Cyril Mougin**, <cyril.mougin@usherbrooke.ca>
