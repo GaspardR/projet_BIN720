@@ -39,12 +39,10 @@ class Cell():
             if feature=='gene'
         ]
         self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
-        self.cancer_genes = parser.tsv(cancer_genes_file)
+        cancer_genes = parser.tsv(cancer_genes_file)
         for gene in self.genes:
-            if gene.name in self.cancer_genes.keys():
-                gene.role = self.cancer_genes[gene.name]
-        # self.cancer_genes = self._random_gene_cancer_set()
-        # self._random_gene_cancer_set()
+            if gene.name in cancer_genes.keys():
+                gene.role = cancer_genes[gene.name]
 
     def add_gene(self, gene, index=None):
         if not isinstance(gene, Gene):
@@ -83,16 +81,3 @@ class Cell():
 
     def get_state():
         return cell.state
-
-    def _random_gene_cancer_set(self):
-        # random.seed(5)
-        self.cancer_genes = random.sample(range(len(self.genes)), k=50)
-        self.suppressor_genes = [i+1 for i in self.cancer_genes]
-        self.cancer_genes = [self.genes[i] for i in self.cancer_genes]
-        self.cancer_genes = [i.set_importance(-1) for i in self.cancer_genes]
-        self.suppressor_genes = [self.genes[i] for i in self.suppressor_genes]
-        self.suppressor_genes = [
-            i.set_importance(1)
-            for i in self.suppressor_genes
-        ]
-        # return [self.genes[i] for i in cancer_genes]
