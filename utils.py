@@ -13,8 +13,13 @@ def random_delete(cell):
     gene = cell.genes[i]
     if len(gene) <= 15:
         return random_delete(cell)
-    if cell.is_important(gene):
+
+    # Check gene importance and change cell state accordingly
+    if gene.role == 'oncogene':
+        cell.state -= 1
+    elif gene.role == 'tumor_suppressor':
         cell.state += 1
+
     start, end = get_random_interval(len(gene))
     gene.delete_sequence(start, end)
     cell.update_chromosome(gene.chromosome, -(end-start), i+1)
@@ -26,8 +31,13 @@ def random_delete(cell):
 def random_duplicate(cell):
     i = random.choice(range(len(cell.genes)))
     gene = cell.genes[i]
-    if cell.is_important(gene):
+
+    # Check gene importance and change cell state accordingly
+    if gene.role == 'oncogene':
         cell.state += 1
+    elif gene.role == 'tumor_suppressor':
+        cell.state -= 1
+
     start, end = get_random_interval(len(gene))
     sequence = gene.sequence[start:end]
     gene.insert_sequence(end, sequence)
@@ -41,16 +51,19 @@ def random_insert(cell):
     # Get a sequence
     i = random.choice(range(len(cell.genes)))
     gene1 = cell.genes[i]
-    if cell.is_important(gene1):
-        cell.state += 1
+    if len(gene1) <= 15:
+        return random_insert(cell)
     start, end = get_random_interval(len(gene1))
     sequence = gene1.sequence[start:end]
 
     # Insert sequence in another gene
     j = random.choice(range(len(cell.genes)))
     gene2 = cell.genes[j]
-    if cell.is_important(gene2):
+
+    # Check gene importance and change cell state accordingly
+    if gene2.role != '':
         cell.state += 1
+
     pos = random.choice(range(len(gene2)))
     gene2.insert_sequence(pos, sequence)
     cell.update_chromosome(gene2.chromosome, len(sequence), j+1)
@@ -65,8 +78,12 @@ def random_move(cell):
     # Get a sequence and remove it
     i = random.choice(range(len(cell.genes)))
     gene1 = cell.genes[i]
-    if cell.is_important(gene1):
+    if len(gene1) <= 15:
+        return random_move(cell)
+    # Check gene importance and change cell state accordingly
+    if gene1.role != '':
         cell.state += 1
+
     start, end = get_random_interval(len(gene1))
     sequence = gene1.sequence[start:end]
     gene1.delete_sequence(start, end)
@@ -75,8 +92,11 @@ def random_move(cell):
     # Insert sequence in another gene
     j = random.choice(range(len(cell.genes)))
     gene2 = cell.genes[j]
-    if cell.is_important(gene2):
+
+    # Check gene importance and change cell state accordingly
+    if gene2.role != '':
         cell.state += 1
+
     pos = random.choice(range(len(gene2)))
     gene2.insert_sequence(pos, sequence)
     cell.update_chromosome(gene2.chromosome, len(sequence), j+1)
@@ -90,9 +110,14 @@ def random_move(cell):
 def random_gene_duplication(cell):
     i = random.choice(range(len(cell.genes)))
     gene = cell.genes[i]
-    if cell.is_important(gene):
-        cell.state += 1
     gene_copy = gene.copy()
+
+    # Check gene importance and change cell state accordingly
+    if gene.role == 'oncogene':
+        cell.state += 1
+    elif gene.role == 'tumor_suppressor':
+        cell.state -= 1
+
     gene_copy.start = gene.end + 1
     gene_copy.end = gene_copy.start + len(gene)
     cell.add_gene(gene_copy, index=i+1)
@@ -115,9 +140,13 @@ def random_gene_insert(cell):
     # Get random gene_copy
     i = random.choice(range(len(cell.genes)))
     gene = cell.genes[i]
-    if cell.is_important(gene):
-        cell.state += 1
     gene_copy = gene.copy()
+
+    # Check gene importance and change cell state accordingly
+    if gene.role == 'oncogene':
+        cell.state += 1
+    elif gene.role == 'tumor_suppressor':
+        cell.state -= 1
 
     # Get other random gene and insert gene_copy after it
     j = random.choice(range(len(cell.genes)))
@@ -145,8 +174,10 @@ def random_gene_move(cell):
     # Get random gene and remove from cell
     i = random.choice(range(len(cell.genes)))
     gene = cell.remove_gene(i)
-    if cell.is_important(gene):
+    if gene.role == 'oncogene':
         cell.state += 1
+    elif gene.role == 'tumor_suppressor':
+        cell.state -= 1
     to_return = [
         gene.chromosome,
         gene.gene_id,
