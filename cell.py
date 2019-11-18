@@ -6,17 +6,18 @@ import random
 
 # User defined modules
 from gene import Gene
-from gtf import dataframe
+import parser
 
 class Cell():
-    def __init__(self, fasta, annotation):
+    def __init__(self, fasta, annotation, cancer_genes_file):
         self.state = 0
         self.fasta = fasta
         # Need to do 2 times to account for 2 copies of each chromosome
-        self.frame = dataframe(annotation)
+        self.frame = parser.gtf(annotation)
         self.genes = [
             Gene(
                 self.frame['gene_id'][i],
+                self.frame['gene_name'][i],
                 self.frame['chromosome'][i] + '_1',
                 self.frame['start'][i],
                 self.frame['end'][i],
@@ -28,6 +29,7 @@ class Cell():
         self.genes += [
             Gene(
                 self.frame['gene_id'][i],
+                self.frame['gene_name'][i],
                 self.frame['chromosome'][i] + '_2',
                 self.frame['start'][i],
                 self.frame['end'][i],
@@ -37,7 +39,12 @@ class Cell():
             if feature=='gene'
         ]
         self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
-        self.cancer_genes = self._random_gene_cancer_set()
+        self.cancer_genes = parser.tsv(cancer_genes_file)
+        for gene in self.genes:
+            if gene.name in self.cancer_genes.keys():
+                gene.role = self.cancer_genes[gene.name]
+        # self.cancer_genes = self._random_gene_cancer_set()
+        # self._random_gene_cancer_set()
 
     def add_gene(self, gene, index=None):
         if not isinstance(gene, Gene):
@@ -71,21 +78,21 @@ class Cell():
             self.genes[index].end += length
             index += 1
 
+    def copy(self):
+        raise NotImplementedError()
+
     def get_state():
-        pass
-
-    def set_state():
-        pass
-
-    def is_important(self, gene):
-        if not isinstance(gene, Gene):
-            raise TypeError('gene argument passed was not a Gene()')
-        for c_gene in self.cancer_genes:
-            if gene == c_gene:
-                return True
-        return False
+        return cell.state
 
     def _random_gene_cancer_set(self):
         # random.seed(5)
-        cancer_genes = random.sample(range(len(self.genes)), k=50)
-        return [self.genes[i] for i in cancer_genes]
+        self.cancer_genes = random.sample(range(len(self.genes)), k=50)
+        self.suppressor_genes = [i+1 for i in self.cancer_genes]
+        self.cancer_genes = [self.genes[i] for i in self.cancer_genes]
+        self.cancer_genes = [i.set_importance(-1) for i in self.cancer_genes]
+        self.suppressor_genes = [self.genes[i] for i in self.suppressor_genes]
+        self.suppressor_genes = [
+            i.set_importance(1)
+            for i in self.suppressor_genes
+        ]
+        # return [self.genes[i] for i in cancer_genes]
