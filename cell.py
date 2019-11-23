@@ -60,7 +60,7 @@ class Cell():
     def get_genes_sequence(self):
         for chromo in SeqIO.parse(self.fasta, 'fasta'):
             for gene in self.genes:
-                if gene.chromosome == str(chromo.id):
+                if gene.chromosome[:-2] == str(chromo.id):
                     if gene.strand == '-':
                         gene.sequence = str(
                             chromo.seq[gene.start : gene.end + 1].complement()
