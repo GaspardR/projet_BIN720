@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 class Gene():
-    def __init__(self, gene_id, name, chromosome, start, end, strand, sequence='', role=''):
+    def __init__(self, gene_id, name, chromosome, start, end, strand, sequence='', role='', weight=0):
         self.gene_id = gene_id
         self.name = name
         self.chromosome = str(chromosome)
@@ -10,6 +10,7 @@ class Gene():
         self.strand = strand
         self.sequence = sequence
         self.role = role
+        self.weight = weight
 
     def __len__(self):
         return self.end - self.start
@@ -17,11 +18,15 @@ class Gene():
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (self.gene_id == other.gene_id and
-                self.sequence == other.sequence)
+                    self.start == other.start and
+                    self.end == other.end)
         return False
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __lt__(self, other):
+        return self.start < other.start
 
     def copy(self):
         other = Gene(
@@ -31,11 +36,11 @@ class Gene():
             self.start,
             self.end,
             self.strand,
-            self.sequence
+            self.sequence,
+            self.role,
+            self.weight
         )
-        other.role = self.role
         return other
-
 
     def delete_sequence(self, start, end):
         self.sequence = self.sequence[:start] + self.sequence[end:]
