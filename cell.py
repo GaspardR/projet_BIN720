@@ -1,83 +1,67 @@
 #!/usr/bin/env python3
 
-# Public modules
-from Bio import SeqIO
-import random
-
-# User defined modules
-from gene import Gene
-import parser
+import utils
+import copy
 
 class Cell():
-    def __init__(self, fasta, annotation, cancer_genes_file):
-        self.state = 0
-        self.fasta = fasta
-        # Need to do 2 times to account for 2 copies of each chromosome
-        self.frame = parser.gtf(annotation)
-        self.genes = [
-            Gene(
-                self.frame['gene_id'][i],
-                self.frame['gene_name'][i],
-                self.frame['chromosome'][i] + '_1',
-                self.frame['start'][i],
-                self.frame['end'][i],
-                self.frame['strand'][i]
-            )
-            for i, feature in enumerate(self.frame['feature'])
-            if feature=='gene'
-        ]
-        self.genes += [
-            Gene(
-                self.frame['gene_id'][i],
-                self.frame['gene_name'][i],
-                self.frame['chromosome'][i] + '_2',
-                self.frame['start'][i],
-                self.frame['end'][i],
-                self.frame['strand'][i]
-            )
-            for i, feature in enumerate(self.frame['feature'])
-            if feature=='gene'
-        ]
-        self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
-        cancer_genes = parser.tsv(cancer_genes_file)
-        for gene in self.genes:
-            if gene.name in cancer_genes.keys():
-                gene.role = cancer_genes[gene.name]
+    def __init__(self, chromosomes, important_genes, state):
+        self.chromosomes = chromosomes
+        self.state = state
+        self._cancer_genes_score = important_genes
 
-    def add_gene(self, gene, index=None):
-        if not isinstance(gene, Gene):
-            raise TypeError('gene argument passed was not a Gene()')
-        if index:
-            self.genes.insert(index, gene)
-        else:
-            # For now, but this isn't pretty at all, should find better method
-            self.genes.append(gene)
-            self.genes.sort(key=lambda gene: (gene.chromosome, gene.start))
+        self._original_balance = self._get_balance()
+        self.balance = self._get_balance()/self._original_balance
 
-    def remove_gene(self, index):
-        return self.genes.pop(index)
 
-    def get_genes_sequence(self):
-        for chromo in SeqIO.parse(self.fasta, 'fasta'):
-            for gene in self.genes:
-                if gene.chromosome[:-2] == str(chromo.id):
-                    if gene.strand == '-':
-                        gene.sequence = str(
-                            chromo.seq[gene.start : gene.end + 1].complement()
-                        )
-                    else:
-                        gene.sequence = str(
-                            chromo.seq[gene.start : gene.end + 1]
-                        )
+    def _get_balance(self):
+        b = self._cancer_genes_score['oncogene'] / \
+            self._cancer_genes_score['tumor_suppressor']
+        return b
 
-    def update_chromosome(self, chromosome, length, index):
-        while (index < len(self.genes)) and (self.genes[index].chromosome == chromosome):
-            self.genes[index].start += length
-            self.genes[index].end += length
-            index += 1
 
     def copy(self):
-        raise NotImplementedError()
+        other = Cell(
+            {k: v.copy() for k, v in self.chromosomes.items()},
+            self._cancer_genes_score,
+            self.state
+        )
+        other._original_balance = self._original_balance
+        other.balance = self.balance
+        return other
 
-    def get_state():
-        return cell.state
+
+    def add_score(self, key, score):
+        self._cancer_genes_score[key] += score
+
+
+    def update_balance(self):
+        self.balance = self._get_balance()/self._original_balance
+
+
+    def cycle(self):
+        if (self.balance < 1.2 and self.balance > 0.8):
+            # Healthy
+            nb_operations = 5
+        elif (self.balance >=1.2 and self.balance < 1.3) or (self.balance <= 0.8 and self.balance > 0.7):
+            # Moderately healthy
+            nb_operations = 10
+        elif (self.balance >=1.3 and self.balance < 1.5) or (self.balance <= 0.7 and self.balance > 0.5):
+            # Not to healthy
+            nb_operations = 20
+        else:
+            # Cancer
+            nb_operations = 25
+
+        ops = [utils.random_operation(self) for i in range(nb_operations)]
+        self.update_balance()
+        return ops
+
+
+    def get_state(self):
+        if (self.balance < 1.3) and (self.balance > 0.7):
+            self.state = 'healthy'
+        elif (self.balance >= 1.3 and self.balance < 1.5) or (self.balance <=0.7 and self.balance > 0.5):
+            self.state = 'healthy'
+        elif (self.balance >=1.5) or (self.balance <= 0.5) :
+            self.state = 'cancer'
+        return self.state
