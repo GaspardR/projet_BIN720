@@ -56,7 +56,6 @@ def preprocess(annotation, cancer_genes_file):
 
 def run(gtf, cancer_genes_file, nb_cells, nb_cycle):
     nb_cancer = 0
-    nb_healthy = 0
 
     chromosomes, important_genes = preprocess(gtf, cancer_genes_file)
     my_cell = Cell(chromosomes, important_genes, state='healthy')
@@ -69,13 +68,10 @@ def run(gtf, cancer_genes_file, nb_cells, nb_cycle):
             cell_cpt += 1
         if cell.get_state() == 'cancer':
             nb_cancer += 1
-        else:
-            nb_healthy += 1
-    return nb_cancer, nb_healthy
+    return nb_cancer
 
 
 if __name__ in "__main__":
-    print('\nStarting\n')
     parser = argparse.ArgumentParser()
 
     parser.add_argument('annotation', help="annotation file in .gtf format")
@@ -104,10 +100,10 @@ if __name__ in "__main__":
     number_of_cycles = args.cycles
 
 
-    nb_cancer, nb_healthy  = run(
+    nb_cancer  = run(
         annotation,
         cancer_genes,
         cell_population,
         number_of_cycles
     )
-    print(nb_cancer, nb_healthy)
+    print(nb_cancer)
