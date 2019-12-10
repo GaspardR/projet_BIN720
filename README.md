@@ -6,12 +6,7 @@ The aim of this project is to simulate the evolution of a healthy cell towards a
 
 ### **Prerequisites**
 
-This project was developped using `Python 3.6` and the following packages are
-necessary for it to run.
-
-- [Biopython](https://biopython.org/) (v1.74 or higher)
-
-It can be installed using `pip3 install biopython` or [click here to follow alternative ways](https://biopython.org/wiki/Download).
+This project was developped using `Python 3.6` and only the included basic packages are used.
 
 ### **Installing**
 
@@ -20,18 +15,12 @@ Installing this project is as easy as cloning the git repository.
 git clone https://github.com/GaspardR/projet_BIN720.git
 ```
 
-Next, you need to download the human genome annotation and each chromosome sequence from Ensembl
-Also, you will need to download the cancer associated genes annotation from CancerMine
+Next, you need to download the human genome annotation.
+Also, you will need to download the cancer associated genes annotation from CancerMine.
 ```bash
 cd /path/to/this/repository/
 mkdir data/
 cd data/
-
-# All chromosome sequences
-wget ftp://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.*
-gunzip *
-cat * > all_chromosome.fa
-rm Homo_sapiens.GRCh38.dna.chromosome*
 
 # Genome annotation
 wget ftp://ftp.ensembl.org/pub/release-98/gtf/homo_sapiens/Homo_sapiens.GRCh38.98.gtf.gz
@@ -45,8 +34,15 @@ wget https://zenodo.org/record/3525385/files/cancermine_collated.tsv
 ### **Running**
 Simply run with:
 ```
-python3 main.py
+python3 main.py /path/to/annotation.gtf /path/to/cancer_genes_annotation.tsv $SIZE_OF_POPULATION $NUMBER_OF_CYCLES
 ```
+Where `$SIZE_OF_POPULATION`is the number of cells to use for the simulation and
+`$NUMBER_OF_CYCLES` the number of cycles to do for each cell.
+
+The return value is the number of cells that developped a cancerous state.
+
+__NOTE:__
+Usage of custom annotations for both genes and cancer_genes is possible, please follow see the `--help` and/or don't hesitate to contact us!
 
 ## **Authors**
 - **Gaspard Reulet**, <gaspard.reulet@usherbrooke.ca>
