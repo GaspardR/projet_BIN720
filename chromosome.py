@@ -2,8 +2,6 @@
 
 from bisect import bisect_right
 
-from gene import Gene
-
 class Chromosome():
     def __init__(self, id, genes):
         self.id = id
@@ -16,8 +14,6 @@ class Chromosome():
         return Chromosome(self.id, [g.copy() for g in self.genes])
 
     def add_gene(self, gene, index=None):
-        if not isinstance(gene, Gene):
-            raise TypeError('gene argument passed was not a Gene()')
         if not index:
             index = bisect_right(self.genes, gene)
         self.genes.insert(index, gene)
