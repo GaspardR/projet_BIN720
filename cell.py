@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import utils
-import copy
 
 class Cell():
     def __init__(self, chromosomes, important_genes, state):
         self.chromosomes = chromosomes
-        self.state = state
         self._cancer_genes_score = important_genes
+        self.state = state
+
 
         self._original_balance = self._get_balance()
         self.balance = self._get_balance()/self._original_balance
@@ -60,7 +60,7 @@ class Cell():
     def get_state(self):
         if (self.balance < 1.3) and (self.balance > 0.7):
             self.state = 'healthy'
-        elif (self.balance >= 1.3 and self.balance < 1.5) or (self.balance <=0.7 and self.balance > 0.5):
+        elif (self.balance >= 1.3 and self.balance < 1.5) or (self.balance <= 0.7 and self.balance > 0.5):
             self.state = 'healthy'
         elif (self.balance >=1.5) or (self.balance <= 0.5) :
             self.state = 'cancer'
